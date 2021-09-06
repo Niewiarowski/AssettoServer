@@ -19,6 +19,11 @@ namespace AssettoServer.Server.Configuration
         public int OutsideNetworkBubbleRefreshRateHz { get; set; } = 4;
         public bool EnableServerDetails { get; set; } = true;
         public string ServerDescription { get; set; } = "";
+        public string OwmApiKey { get; set; } = "";
+        public bool EnableLiveWeather { get; set; } = false;
+        public bool EnableRealTime { get; set; } = false;
+        public bool EnableWeatherFx { get; set; } = false;
+        public double RainTrackGripReduction { get; set; } = 0;
 
         [JsonIgnore]
         public int MaxAfkTimeMilliseconds => MaxAfkTimeMinutes * 60000;

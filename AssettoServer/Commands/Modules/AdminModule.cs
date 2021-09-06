@@ -5,6 +5,7 @@ using AssettoServer.Network.Tcp;
 using AssettoServer.Network.Udp;
 using AssettoServer.Server;
 using AssettoServer.Server.Configuration;
+using AssettoServer.Server.Weather;
 using Humanizer;
 using Humanizer.Bytes;
 using Qmmands;
@@ -88,14 +89,57 @@ namespace AssettoServer.Commands.Modules
         [Command("setweather")]
         public void SetWeather(int weatherId)
         {
-            var allWeathers = Context.Server.Configuration.Weathers;
-            if (weatherId >= 0 && weatherId < allWeathers.Count)
+            if (Context.Server.WeatherProvider is DefaultWeatherProvider provider)
             {
-                WeatherConfiguration newWeather = allWeathers[weatherId];
-                Context.Server.SetWeather(newWeather);
-                Reply("Weather has been set.");
+                if (provider.SetWeatherConfiguration(weatherId))
+                {
+                    Reply("Weather has been set.");
+                }
+                else
+                {
+                    Reply("There is no weather with this id.");
+                }
             }
-            else Reply("There is no weather with this ID.");
+            else
+            {
+                Reply("Setting a weather configuration is not supported.");
+            }
+
+        }
+
+        [Command("setcspweather")]
+        public void SetCspWeather(int upcoming, int duration)
+        {
+            Context.Server.SetCspWeather((WeatherFxType)upcoming, duration);
+            Reply("Weather has been set.");
+        }
+
+        [Command("setrain")]
+        public void SetRain(float intensity, float wetness, float water)
+        {
+            Context.Server.CurrentWeather.RainIntensity = intensity;
+            Context.Server.CurrentWeather.RainWetness = wetness;
+            Context.Server.CurrentWeather.RainWater = water;
+            Context.Server.SendCurrentWeather();
+        }
+
+        [Command("setgrip")]
+        public void SetGrip(float grip)
+        {
+            Context.Server.CurrentWeather.TrackGrip = grip;
+            Context.Server.SendCurrentWeather();
+        }
+
+        [Command("sendtcp")]
+        public void SendTcp(string filename)
+        {
+            Context.Server.SendRawFileTcp(filename);
+        }
+        
+        [Command("sendudp")]
+        public void SendUdp(string filename)
+        {
+            Context.Server.SendRawFileUdp(filename);
         }
 
         [Command("setafktime")]
