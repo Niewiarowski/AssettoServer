@@ -53,6 +53,7 @@ namespace AssettoServer.Network.Tcp
         private CancellationTokenSource DisconnectTokenSource { get; }
         private Task SendLoopTask { get; set; }
         private long LastChatTime { get; set; }
+        private SteamId? SteamId { get; set; }
 
         internal ACTcpClient(ACServer server, TcpClient tcpClient)
         {
@@ -299,7 +300,10 @@ namespace AssettoServer.Network.Tcp
                     if (arg3 != AuthResponse.OK)
                         Server.Log.Information("Steam auth ticket verification failed ({0}) for {1}.", arg3, Name);
                     else
+                    {
+                        SteamId = arg1;
                         Server.Log.Information("Steam auth ticket verification succeeded for {0}.", Name);
+                    }
 
                     taskCompletionSource.SetResult(arg3 == AuthResponse.OK);
                 }
@@ -526,11 +530,15 @@ namespace AssettoServer.Network.Tcp
                 await Task.WhenAny(Task.Delay(2000), SendLoopTask);
                 OutgoingPacketChannel.Writer.TryComplete();
                 DisconnectTokenSource.Cancel();
+                DisconnectTokenSource.Dispose();
 
                 if (IsConnected)
                     await Server.DisconnectClientAsync(this);
 
                 CloseConnection();
+
+                if (SteamId != null)
+                    SteamServer.EndSession(SteamId.Value);
             }
             catch (Exception ex)
             {
