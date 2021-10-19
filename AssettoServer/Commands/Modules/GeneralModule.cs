@@ -1,4 +1,5 @@
-﻿using AssettoServer.Network.Packets.Shared;
+﻿using AssettoServer.Commands.Attributes;
+using AssettoServer.Network.Packets.Shared;
 using AssettoServer.Network.Tcp;
 using AssettoServer.Server;
 using Qmmands;
@@ -31,11 +32,11 @@ namespace AssettoServer.Commands.Modules
         }
 #endif
 
-        [Command("race")]
+        [Command("race"), RequireConnectedPlayer]
         public void Race(ACTcpClient player)
             => Context.Client.EntryCar.ChallengeCar(player.EntryCar);
 
-        [Command("accept")]
+        [Command("accept"), RequireConnectedPlayer]
         public async ValueTask AcceptRaceAsync()
         {
             Race currentRace = Context.Client.EntryCar.CurrentRace;

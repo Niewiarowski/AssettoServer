@@ -1,4 +1,5 @@
-﻿using AssettoServer.Server;
+﻿using AssettoServer.Network.Packets.Shared;
+using AssettoServer.Server;
 using AssettoServer.Server.Configuration;
 using Steamworks;
 using System;
@@ -15,7 +16,18 @@ namespace AssettoServer
             ACServer server = new ACServer(config);
 
             await server.StartAsync();
-            await Task.Delay(-1);
+
+            while (true)
+            {
+                string command = Console.ReadLine();
+                ChatMessage chatMessage = new ChatMessage
+                {
+                    Message = command,
+                    SessionId = 255
+                };
+
+                await server.ProcessCommandAsync(null, chatMessage);
+            }
         }
     }
 }

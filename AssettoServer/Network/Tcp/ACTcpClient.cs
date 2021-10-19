@@ -121,6 +121,7 @@ namespace AssettoServer.Network.Tcp
                 catch (Exception ex)
                 {
                     Server.Log.Error(ex, "Error sending {0} to {1}.", packet?.GetType().Name ?? "(no packet)", Name);
+                    _ = DisconnectAsync();
                 }
             }
         }
